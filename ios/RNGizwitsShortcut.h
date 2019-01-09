@@ -1,11 +1,6 @@
-
-#if __has_include("RCTBridgeModule.h")
-#import "RCTBridgeModule.h"
-#else
+#import <React/RCTEventEmitter.h>
 #import <React/RCTBridgeModule.h>
-#endif
-
-@interface RNGizwitsShortcut : NSObject <RCTBridgeModule>
-
+NS_ASSUME_NONNULL_BEGIN
+@interface RNGizwitsShortcut : RCTEventEmitter <RCTBridgeModule>
 @end
-  
+NS_ASSUME_NONNULL_END
