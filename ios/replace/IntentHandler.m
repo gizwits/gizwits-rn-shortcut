@@ -37,10 +37,10 @@
 
 - (void)handleGizManualScene:(GizManualSceneIntent *)intent completion:(void (^)(GizManualSceneIntentResponse * _Nonnull))completion {
     
-    [[GizSiriAppGroupManager defaultManager] setupWithGroupId:<#Your Group ID#>];
+    [[GizSiriAppGroupManager defaultManager] setupWithGroupId:@"group.com.gizwits.xb"];
     NSString *token = [[GizSiriAppGroupManager defaultManager] getToken];
 
-    NSDictionary *headers = @{@"Authorization": token,
+    NSDictionary *headers = @{@"Authorization": token ?: intent.token,
                               @"Version": intent.version
                               };
     
