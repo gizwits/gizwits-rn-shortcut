@@ -1,5 +1,5 @@
 
-package com.reactlibrary;
+package com.gizwitsshortcut;
 
 import java.util.Arrays;
 import java.util.Collections;
