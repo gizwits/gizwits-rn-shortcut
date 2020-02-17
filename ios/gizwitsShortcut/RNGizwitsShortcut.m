@@ -5,6 +5,12 @@
 #import <Intents/Intents.h>
 #import <IntentsUI/IntentsUI.h>
 
+NSString * const GizSiriPermissionStatusNotDetermined = @"undetermined";
+NSString * const GizSiriPermissionStatusRestricted = @"restricted";
+NSString * const GizSiriPermissionStatusDenied = @"denied";
+NSString * const GizSiriPermissionStatusAuthorized = @"granted";
+NSString * const GizSiriPermissionStatusUnknown = @"unknown";
+NSString * const GizSiriPermissionStatusNotSupport = @"not support";
 
 typedef NS_ENUM(NSInteger, GizSiriAuthorizationStatus) {
     GizSiriAuthorizationStatusNotDetermined = 0,
@@ -13,7 +19,6 @@ typedef NS_ENUM(NSInteger, GizSiriAuthorizationStatus) {
     GizSiriAuthorizationStatusAuthorized,
     GizSiriAuthorizationStatusUnknown,
 };
-
 
 GizSiriAuthorizationStatus SiriToGiz(INSiriAuthorizationStatus status) {
     GizSiriAuthorizationStatus gizStatus = GizSiriAuthorizationStatusUnknown;
@@ -127,6 +132,7 @@ RCT_EXPORT_METHOD(addSiriShortcut:(NSDictionary *)info result:(RCTResponseSender
         
         INUIAddVoiceShortcutViewController *viewController = [[INUIAddVoiceShortcutViewController alloc] initWithShortcut:shortcut];
         viewController.delegate = self;
+        viewController.modalPresentationStyle = UIModalPresentationFullScreen;
         [[self getRootVC] presentViewController:viewController animated:YES completion:nil];
     } else {
         result(@[@"Not supported!"]);
@@ -159,13 +165,13 @@ RCT_EXPORT_METHOD(editSiriShortcut:(NSDictionary *)info result:(RCTResponseSende
             }
             
             self.editCallbackResult = result;
-            
-            INUIEditVoiceShortcutViewController *viewController = [[INUIEditVoiceShortcutViewController alloc] initWithVoiceShortcut:voiceShortcut];
-            viewController.delegate = self;
-            [vc presentViewController:viewController animated:YES completion:nil];
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                INUIEditVoiceShortcutViewController *viewController = [[INUIEditVoiceShortcutViewController alloc] initWithVoiceShortcut:voiceShortcut];
+                           viewController.delegate = self;
+                       viewController.modalPresentationStyle = UIModalPresentationFullScreen;
+                                  [vc presentViewController:viewController animated:YES completion:nil];
+            });
         }];
-        
-        
     } else {
         result(@[@"Not supported!"]);
     }
@@ -276,6 +282,59 @@ RCT_EXPORT_METHOD(requestSiriAuthorizationStatus:(RCTResponseSenderBlock)result)
         }];
     } else {
         [self sendNotSupport:@"siri" withCallbackResult:result];
+    }
+}
+
+RCT_EXPORT_METHOD(siriPermissionStatus:(RCTPromiseResolveBlock)resolve
+                   rejecter:(RCTPromiseRejectBlock)reject) {
+    if (@available(iOS 10.0, *)) {
+        INSiriAuthorizationStatus status = [INPreferences siriAuthorizationStatus];
+        switch (status) {
+            case INSiriAuthorizationStatusNotDetermined:
+                resolve(@{@"status":GizSiriPermissionStatusNotDetermined});
+                break;
+            case INSiriAuthorizationStatusRestricted:
+                resolve(@{@"status":GizSiriPermissionStatusRestricted});
+                break;
+            case INSiriAuthorizationStatusDenied:
+                resolve(@{@"status":GizSiriPermissionStatusDenied});
+                break;
+            case INSiriAuthorizationStatusAuthorized:
+                resolve(@{@"status":GizSiriPermissionStatusAuthorized});
+                break;
+            default:
+                resolve(@{@"status":GizSiriPermissionStatusUnknown});
+                break;
+        }
+    } else{
+        resolve(@{@"status":GizSiriPermissionStatusNotSupport});
+    }
+}
+
+RCT_EXPORT_METHOD(requestSiriPermission:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+    if (@available(iOS 10.0, *)) {
+        [INPreferences requestSiriAuthorization:^(INSiriAuthorizationStatus status) {
+            switch (status) {
+                case INSiriAuthorizationStatusNotDetermined:
+                    resolve(@{@"status":GizSiriPermissionStatusNotDetermined});
+                    break;
+                case INSiriAuthorizationStatusRestricted:
+                    resolve(@{@"status":GizSiriPermissionStatusRestricted});
+                    break;
+                case INSiriAuthorizationStatusDenied:
+                    resolve(@{@"status":GizSiriPermissionStatusDenied});
+                    break;
+                case INSiriAuthorizationStatusAuthorized:
+                    resolve(@{@"status":GizSiriPermissionStatusAuthorized});
+                    break;
+                default:
+                    resolve(@{@"status":GizSiriPermissionStatusUnknown});
+                    break;
+            }
+        }];
+    } else {
+        resolve(@{@"status":GizSiriPermissionStatusNotSupport});
     }
 }
 
