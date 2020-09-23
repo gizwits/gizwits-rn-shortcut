@@ -155,7 +155,7 @@ RCT_EXPORT_METHOD(editSiriShortcut:(NSDictionary *)info result:(RCTResponseSende
         [[INVoiceShortcutCenter sharedCenter] getVoiceShortcutWithIdentifier:UUID completion:^(INVoiceShortcut * _Nullable voiceShortcut, NSError * _Nullable error) {
             
             if (error) {
-                result(@[error.localizedDescription]);
+                result(@[@"Not Found!"]);
                 return;
             }
             
@@ -186,7 +186,7 @@ RCT_EXPORT_METHOD(getSiriShortcut:(NSString *)sceneId result:(RCTResponseSenderB
             
             if (error) {
                 NSLog(@"getSiriShortcut error => %@", error);
-                result(@[error.localizedDescription]);
+                result(@"Not Found!");
                 return;
             }
             
@@ -220,7 +220,7 @@ RCT_EXPORT_METHOD(getAllSiriShortcut:(RCTResponseSenderBlock)result){
             
             if (error) {
                 NSLog(@"getAllSiriShortcut error => %@", error);
-                result(@[error.localizedDescription]);
+                result(@[@"Not Found!"]);
                 return;
             }
             
