@@ -1,8 +1,8 @@
 
 {
   "name": "react-native-gizwits-shortcut",
-  "version": "2.0.4",
-  "description": "",
+  "version": "2.1.0",
+  "description": "兼容70RN",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
